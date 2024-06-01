@@ -1,131 +1,149 @@
 #!/bin/bash
-# Function to create a task
-create_task() {
-    echo "Creating a new task..."
-    read -rp "Enter title: " title
-    title=$(echo "$title" | tr -dc '[:alnum:][:space:]')
-    if [[ -z "$title" ]]; then
-        echo "Title is required." >&2
+
+# Fonction pour créer une tâche
+ajouter_tache() {
+    echo "Création d'une nouvelle tâche..."
+    read -rp "Entrez le titre : " titre
+    titre=$(echo "$titre" | tr -dc '[:alnum:][:space:]')
+    if [[ -z "$titre" ]]; then
+        echo "Le titre est requis." >&2
         return
     fi
-    read -rp "Enter due date (YYYY-MM-DD): " due_date
-    if ! [[ "$due_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-        echo "Invalid due date format. Please use YYYY-MM-DD." >&2
+
+    read -rp "Entrez la date limite (AAAA-MM-JJ) : " date_limite
+    if ! [[ "$date_limite" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+        echo "Format de date limite invalide. Veuillez utiliser AAAA-MM-JJ." >&2
         return
     fi
-    read -rp "Enter description: " description
+
+    read -rp "Entrez la description : " description
     description=$(echo "$description" | tr -dc '[:alnum:][:space:]')
-    read -rp "Enter location: " location
-    location=$(echo "$location" | tr -dc '[:alnum:][:space:]')
-    read -rp "Enter priority (high/medium/low): " priority
-    if [[ -z "$priority" ]]; then
-        echo "Priority is required." >&2
+    read -rp "Entrez l'emplacement : " emplacement
+    emplacement=$(echo "$emplacement" | tr -dc '[:alnum:][:space:]')
+    read -rp "Entrez la priorité (haute/moyenne/basse) : " priorite
+    if [[ -z "$priorite" ]]; then
+        echo "La priorité est requise." >&2
         return
     fi
-    read -rp "Is task completed? (yes/no): " completion
-    if [[ "$completion" == "yes" ]]; then
+
+    read -rp "La tâche est-elle terminée ? (oui/non) : " completion
+    if [[ "$completion" == "oui" ]]; then
         completion=true
     else
         completion=false
     fi
-    echo "$title,$due_date,$description,$location,$priority,$completion" >> tasks.csv
-    echo "Task created successfully."
+
+    echo "$titre,$date_limite,$description,$emplacement,$priorite,$completion" >> taches.csv
+    echo "Tâche créée avec succès."
 }
-# Function to update a task
-update_task() {
-    echo "Updating a task..."
-    read -rp "Enter task id: " task_id
-    if ! [[ "$task_id" =~ ^[0-9]+$ ]]; then
-        echo "Invalid task id." >&2
+
+# Fonction pour mettre à jour une tâche
+modifier_tache() {
+    echo "Modification d'une tâche..."
+    read -rp "Entrez l'ID de la tâche : " id_tache
+    if ! [[ "$id_tache" =~ ^[0-9]+$ ]]; then
+        echo "ID de tâche invalide." >&2
         return
     fi
-    read -rp "Enter new title: " title
-    title=$(echo "$title" | tr -dc '[:alnum:][:space:]')
-    if [[ -z "$title" ]]; then
-        echo "Title is required." >&2
+
+    read -rp "Entrez le nouveau titre : " titre
+    titre=$(echo "$titre" | tr -dc '[:alnum:][:space:]')
+    if [[ -z "$titre" ]]; then
+        echo "Le titre est requis." >&2
         return
     fi
-    read -rp "Enter new due date (YYYY-MM-DD): " due_date
-    if ! [[ "$due_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-        echo "Invalid due date format. Please use YYYY-MM-DD." >&2
+
+    read -rp "Entrez la nouvelle date limite (AAAA-MM-JJ) : " date_limite
+    if ! [[ "$date_limite" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+        echo "Format de date limite invalide. Veuillez utiliser AAAA-MM-JJ." >&2
         return
     fi
-    read -rp "Enter new description: " description
+
+    read -rp "Entrez la nouvelle description : " description
     description=$(echo "$description" | tr -dc '[:alnum:][:space:]')
-    read -rp "Enter new location: " location
-    location=$(echo "$location" | tr -dc '[:alnum:][:space:]')
-    read -rp "Enter new priority (high/medium/low): " priority
-    if [[ -z "$priority" ]]; then
-        echo "Priority is required." >&2
+    read -rp "Entrez le nouvel emplacement : " emplacement
+    emplacement=$(echo "$emplacement" | tr -dc '[:alnum:][:space:]')
+    read -rp "Entrez la nouvelle priorité (haute/moyenne/basse) : " priorite
+    if [[ -z "$priorite" ]]; then
+        echo "La priorité est requise." >&2
         return
     fi
-    read -rp "Is task completed? (yes/no): " completion
-    if [[ "$completion" == "yes" ]]; then
+
+    read -rp "La tâche est-elle terminée ? (oui/non) : " completion
+    if [[ "$completion" == "oui" ]]; then
         completion=true
     else
         completion=false
     fi
-    sed -i "${task_id}s/[^,]*/$(sed 's/[&/\]/\\&/g' <<< "$title")/1" tasks.csv
-    sed -i "${task_id}s/[^,]*/$(sed 's/[&/\]/\\&/g' <<< "$due_date")/2" tasks.csv
-    sed -i "${task_id}s/[^,]*/$(sed 's/[&/\]/\\&/g' <<< "$description")/3" tasks.csv
-    sed -i "${task_id}s/[^,]*/$(sed 's/[&/\]/\\&/g' <<< "$location")/4" tasks.csv
-    sed -i "${task_id}s/[^,]*/$(sed 's/[&/\]/\\&/g' <<< "$priority")/5" tasks.csv
-    sed -i "${task_id}s/[^,]*/$(sed 's/[&/\]/\\&/g' <<< "$completion")/6" tasks.csv
-    echo "Task updated successfully."
+
+    sed -i "${id_tache}s/[^,]*/$(sed 's/[&/\]/\\&/g' <<< "$titre")/1" taches.csv
+    sed -i "${id_tache}s/[^,]*/$(sed 's/[&/\]/\\&/g' <<< "$date_limite")/2" taches.csv
+    sed -i "${id_tache}s/[^,]*/$(sed 's/[&/\]/\\&/g' <<< "$description")/3" taches.csv
+    sed -i "${id_tache}s/[^,]*/$(sed 's/[&/\]/\\&/g' <<< "$emplacement")/4" taches.csv
+    sed -i "${id_tache}s/[^,]*/$(sed 's/[&/\]/\\&/g' <<< "$priorite")/5" taches.csv
+    sed -i "${id_tache}s/[^,]*/$(sed 's/[&/\]/\\&/g' <<< "$completion")/6" taches.csv
+    echo "Tâche modifiée avec succès."
 }
-# Function to delete a task
-delete_task() {
-    echo "Deleting a task..."
-    read -rp "Enter task id: " task_id
-    if ! [[ "$task_id" =~ ^[0-9]+$ ]]; then
-        echo "Invalid task id." >&2
+
+# Fonction pour supprimer une tâche
+supprimer_tache() {
+    echo "Suppression d'une tâche..."
+    read -rp "Entrez l'ID de la tâche : " id_tache
+    if ! [[ "$id_tache" =~ ^[0-9]+$ ]]; then
+        echo "ID de tâche invalide." >&2
         return
     fi
-    if [[ ! -f "tasks.csv" ]]; then
-        echo "Tasks file not found." >&2
+
+    if [[ ! -f "taches.csv" ]]; then
+        echo "Fichier des tâches introuvable." >&2
         return
     fi
-    sed -i "${task_id}d" tasks.csv
-    echo "Task deleted successfully."
+
+    sed -i "${id_tache}d" taches.csv
+    echo "Tâche supprimée avec succès."
 }
-# Function to list all tasks
-list_tasks() {
-    echo "Listing all tasks..."
-    awk -F, 'BEGIN { printf "%-8s %-20s %-12s %-30s %-20s %-10s %-10s\n", "Task ID", "Title", "Due Date", "Description", "Location", "Priority", "Completion" } 
-    { printf "%-8s %-20s %-12s %-30s %-20s %-10s %-10s\n", NR, $1, $2, $3, $4, $5, $6 }' tasks.csv
+
+# Fonction pour lister toutes les tâches
+lister_taches() {
+    echo "Liste de toutes les tâches..."
+    awk -F, 'BEGIN { printf "%-8s %-20s %-12s %-30s %-20s %-10s %-10s\n", "ID Tâche", "Titre", "Date Limite", "Description", "Emplacement", "Priorité", "Achèvement" } 
+    { printf "%-8s %-20s %-12s %-30s %-20s %-10s %-10s\n", NR, $1, $2, $3, $4, $5, $6 }' taches.csv
 }
-# Function to search for a task
-search_task() {
-    echo "Searching for a task..."
-    read -rp "Enter search term: " search_term
-    awk -F, -v search_term="$search_term" 'BEGIN { printf "%-8s %-20s %-12s %-30s %-20s %-10s %-10s\n", "Task ID", "Title", "Due Date", "Description", "Location", "Priority", "Completion" } 
-    $1 ~ search_term || $2 ~ search_term || $3 ~ search_term || $4 ~ search_term || $5 ~ search_term || $6 ~ search_term { printf "%-8s %-20s %-12s %-30s %-20s %-10s %-10s\n", NR, $1, $2, $3, $4, $5, $6 }' tasks.csv
+
+# Fonction pour rechercher une tâche
+rechercher_tache() {
+    echo "Recherche d'une tâche..."
+    read -rp "Entrez le terme de recherche : " terme_recherche
+    awk -F, -v terme_recherche="$terme_recherche" 'BEGIN { printf "%-8s %-20s %-12s %-30s %-20s %-10s %-10s\n", "ID Tâche", "Titre", "Date Limite", "Description", "Emplacement", "Priorité", "Achèvement" } 
+    $1 ~ terme_recherche || $2 ~ terme_recherche || $3 ~ terme_recherche || $4 ~ terme_recherche || $5 ~ terme_recherche || $6 ~ terme_recherche { printf "%-8s %-20s %-12s %-30s %-20s %-10s %-10s\n", NR, $1, $2, $3, $4, $5, $6 }' taches.csv
 }
-# Function to mark a task as completed
-complete_task() {
-    echo "Marking a task as completed..."
-    read -rp "Enter task id: " task_id
-    sed -i "${task_id}s/[^,]*$/Completed/" tasks.csv
-    echo "Task marked as completed."
+
+# Fonction pour marquer une tâche comme terminée
+completer_tache() {
+    echo "Marquage d'une tâche comme terminée..."
+    read -rp "Entrez l'ID de la tâche : " id_tache
+    sed -i "${id_tache}s/[^,]*$/Terminée/" taches.csv
+    echo "Tâche marquée comme terminée."
 }
-# Main program loop
+
+# Boucle principale du programme
 while true; do
-    echo "1. Create a task"
-    echo "2. Update a task"
-    echo "3. Delete a task"
-    echo "4. List all tasks"
-    echo "5. Search for a task"
-    echo "6. Mark a task as completed"
-    echo "7. Exit"
-    read -rp "Enter your choice: " choice
-    case "$choice" in
-        1) create_task ;;
-        2) update_task ;;
-        3) delete_task ;;
-        4) list_tasks ;;
-        5) search_task ;;
-        6) complete_task ;;
+    echo "1. Ajouter une tâche"
+    echo "2. Modifier une tâche"
+    echo "3. Supprimer une tâche"
+    echo "4. Lister toutes les tâches"
+    echo "5. Rechercher une tâche"
+    echo "6. Marquer une tâche comme terminée"
+    echo "7. Quitter"
+    read -rp "Entrez votre choix : " choix
+    case "$choix" in
+        1) ajouter_tache ;;
+        2) modifier_tache ;;
+        3) supprimer_tache ;;
+        4) lister_taches ;;
+        5) rechercher_tache ;;
+        6) completer_tache ;;
         7) break ;;
-        *) echo "Invalid choice." ;;
+        *) echo "Choix invalide." ;;
     esac
 done
